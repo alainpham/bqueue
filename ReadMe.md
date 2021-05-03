@@ -87,7 +87,7 @@ docker run -d --net primenet --ip 172.18.0.10 --name blender-queue blender-queue
 ```
 
 
-Stop or launch multple instaces
+Stop or launch multple instances
 
 ```
 NB_CONTAINERS=2
