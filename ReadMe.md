@@ -118,8 +118,8 @@ Go to http://localhost:8080 and start rendering
   * A render instance is composed of
     * A blender process with the script rest-api.py. This starts blender with a local rest api to open files and start effective renders.
     * The Bqueue app is built with a distributed integration framework Apache Camel (running with Quarkus flavor)
-      * This componenent is responsible for orchestrating broadcasting blend files and render commands through Artemis Broker to other similar instances.
-      * When images are renderd they can be collected by the instance that has requested a render to the network
+      * This component is responsible for orchestrating broadcasting blend files and render commands through Artemis Broker to other similar instances.
+      * When images are rendered they can be collected by the instance that has requested a render to the network
       * A user can upload, broadcast and view the render results in realtime through a web interface.
   * There is no difference between the render instances, they can all act as worker or as a requester to submit renders to the network. The instance that initiates the request will collect the render results back from all the worker instances.
   * We leverage a hungry consumer pattern. Meaning that when a render request is launched, the render is divided into jobs and queued up in a single queue. Whichever worker consumes faster will get more jobs. This allows us to work with hardware of different speeds and still keep all instances as busy as possible to take most advantage of available resources.
