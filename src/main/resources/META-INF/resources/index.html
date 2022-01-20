@@ -71,13 +71,13 @@
                     <label>Filename</label>
                     <input type="text" id="fileName" value="test.blend" placeholder="fileName">
                     <label>Resolution X</label>
-                    <input type="text" id="resolutionX" value="1280" placeholder="resolutionX">
+                    <input type="text" id="resolutionX" value="960" placeholder="resolutionX">
                     <label>Resolution Y</label>
-                    <input type="text" id="resolutionY" value="720" placeholder="resolutionY">
+                    <input type="text" id="resolutionY" value="540" placeholder="resolutionY">
                     <label>Samples</label>
                     <input type="text" id="samples" value="1" placeholder="samples">
                     <label>Frame divider</label>
-                    <input type="text" id="frameDivider" value="2" placeholder="frameDivider">
+                    <input type="text" id="frameDivider" value="4" placeholder="frameDivider">
                 </form>
                 <button  id="send-button"
                     onclick="backEndRequest(null,'/distributed-frame-render','post', formDataToJson('distributed-frame-render-form'))">send</button>

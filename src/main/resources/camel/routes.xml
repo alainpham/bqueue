@@ -32,7 +32,7 @@
 
 
     <!-- this route expects an input stream as input -->
-    <route>
+    <route id="broadcast-blendfile">
         <from uri="direct:broadcast-blendfile"/>
         <inOnly uri="jms:topic:app.blend-files-broadcast?messageConverter=#jmsStreamConverter"/>
         <log message="blend file ${header.id} has been broadcasted to online instances"/>
@@ -42,7 +42,7 @@
     </route>
 
     <!-- this route stores blend files locally -->
-    <route>
+    <route id="store-blendfile">
         <from uri="jms:topic:app.blend-files-broadcast?messageConverter=#jmsStreamConverter"/>
         <setHeader name="CamelFileName">
             <simple>${header.id}</simple>
@@ -83,7 +83,7 @@
         </wireTap>
     </route>
 
-    <route>
+    <route id="notify-received">
         <from uri="jms:topic:app.notify-received"/>
         <unmarshal>
             <json library="Jackson"/>
@@ -91,7 +91,7 @@
         <bean ref="viewUpdate" method="upsertData(${body}, blend-file-broadcast, broadcast-state-table)"/>
     </route>
 
-    <route>
+    <route id="launch-open" >
         <from uri="platform-http:/open"/>
         <unmarshal>
             <json library="Jackson"/>
@@ -102,7 +102,7 @@
         <inOnly uri="jms:topic:app.open-blend-file"/>
     </route>
 
-    <route>
+    <route id="open-blend-file">
         <from uri="jms:topic:app.open-blend-file"/>
         <onException>
             <exception>java.lang.Exception</exception>
@@ -158,7 +158,7 @@
         </wireTap>
     </route>
 
-    <route>
+    <route id="notify-opened">
         <from uri="jms:topic:app.notify-opened"/>
         <unmarshal>
             <json library="Jackson"/>
@@ -167,7 +167,7 @@
     </route>
 
     <!-- role of this is to distribute the render taksks -->
-    <route>
+    <route id="distributed-frame-render">
         <from uri="platform-http:/distributed-frame-render"/>
         <unmarshal>
             <json library="Jackson" unmarshalTypeName="net.alainpham.model.DistributedFrameRenderRequest"/>
@@ -189,7 +189,7 @@
         </setBody>
     </route>
 
-    <route>
+    <route id="render-region">
         <from uri="jms:queue:app.render-region"/>
         <unmarshal>
             <json library="Jackson"  unmarshalTypeName="net.alainpham.model.RenderRegionRequest"/>
@@ -241,7 +241,7 @@
         </wireTap>
     </route>
 
-    <route>
+    <route id="notify-distributed-frame-render">
         <from uri="jms:topic:app.notify-distributed-frame-render"/>
         <unmarshal>
             <json library="Jackson"/>
@@ -249,7 +249,7 @@
         <bean ref="viewUpdate" method="upsertData(${body}, distributed-frame-render-broadcast, distributed-frame-render-broadcast-state-table)"/>
     </route>
 
-    <route>
+    <route id="collector">
         <from uri="jms:queue:app.collector.{{blenderqueue.hostname}}?messageConverter=#jmsStreamConverter"/>
         <log message="${body.class}"/>
         <log message="${headers}"/>
@@ -283,7 +283,7 @@
 
 
     <!-- publish tile to screen -->
-    <route>
+    <route id="publish-on-screen">
         <from uri="seda:showtile"/>
         <bean ref="frameRenderTaskDistributor" method="imageDataFromPng"/>
         <bean ref="viewUpdate" method="upsertData(${body}, tile, tile-table)"/>

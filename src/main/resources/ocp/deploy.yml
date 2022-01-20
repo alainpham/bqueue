@@ -36,7 +36,7 @@ spec:
             scheme: "HTTP"
           initialDelaySeconds: 180
           successThreshold: 1
-        name: "spring-boot"
+        name: "camel-quarkus"
         ports:
         - containerPort: 8080
           name: "http"
@@ -57,11 +57,11 @@ spec:
           successThreshold: 1
         resources:
           limits:
-            cpu: "2.0"
-            memory: "512Mi"
+            cpu: "4.0"
+            memory: "4Gi"
           requests:
-            cpu: "0.2"
-            memory: "128Mi"
+            cpu: "4.0"
+            memory: "4Gi"
         securityContext:
           privileged: false
         volumeMounts:
@@ -129,29 +129,33 @@ metadata:
 type: Opaque
 stringData: 
   application.properties: |
-    logging.config=classpath:logback-dev.xml
+    quarkus.live-reload.watched-resources=camel/routes.xml,camel-rest/rests.xml
 
-    # the options from org.apache.camel.spring.boot.CamelConfigurationProperties can be configured here
-    camel.springboot.name=bqueue
+    camel.context.name = bqueue
 
-    # lets listen on all ports to ensure we can be invoked from the pod IP
-    server.address=0.0.0.0
-    management.server.address=0.0.0.0
-    # lets use a different management port in case you need to listen to HTTP requests on 8080
-    server.port=8080
-    management.server.port=8081
+    camel.main.routes-include-pattern = classpath:camel/routes.xml,classpath:camel-rest/rests.xml
 
-    # disable all management enpoints except health
-    endpoints.enabled = false
-    endpoints.health.enabled = true
-
-    cxf.path=/services
-
-    camel.component.servlet.mapping.contextPath=/camel/*
-    camelrest.contextPath=/camel
-    camelrest.apiversion=1.0-SNAPSHOT
+    camel.rest.binding-mode=json
+    camel.rest.api-context-path=/camel-openapi
 
     theme=main-dark-green
+    
+    quarkus.artemis.url=tcp://event-broker:61616?consumerWindowSize=0
+    quarkus.artemis.username=admin 
+    quarkus.artemis.password=admin
+    quarkus.http.body.handle-file-uploads=true
+    quarkus.http.limits.max-body-size=1024M
+
+    blenderqueue.blend.files.folder=data/blendfiles
+    blenderqueue.render.files.local.folder=data/renders
+    blenderqueue.render.files.collector.folder=data/collected-renders
+    blenderqueue.render.files.final.folder=data/final-renders
+
+    blenderqueue.local.blender.api=localhost:8000
+
+    blenderqueue.hostname=bqueue
+
+    blenderqueue.montage.executable=/usr/bin/montage
 
 ---
 kind: Secret

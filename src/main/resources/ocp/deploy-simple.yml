@@ -1,0 +1,84 @@
+---
+apiVersion: "apps.openshift.io/v1"
+kind: "DeploymentConfig"
+metadata:
+  labels:
+    app: "bqueue"
+    group: "net.alainpham"
+  name: "bqueue"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    app: "bqueue"
+    group: "net.alainpham"
+  strategy:
+    rollingParams:
+      timeoutSeconds: 3600
+    type: "Rolling"
+  template:
+    metadata:
+      labels:
+        app: "bqueue"
+        group: "net.alainpham"
+    spec:
+      containers:
+        - name: "camel-quarkus"
+          image: "alainpham/bqueue:latest"
+          imagePullPolicy: "Always"
+          ports:
+          - containerPort: 8080
+            name: "http"
+            protocol: "TCP"
+          resources:
+            limits:
+              cpu: "4.0"
+              memory: "4Gi"
+            requests:
+              cpu: "4.0"
+              memory: "4Gi"
+          env:
+          - name: "QUARKUS_ARTEMIS_URL"
+            value: "tcp://event-broker-hdls-svc:61616?consumerWindowSize=0"
+      securityContext:
+        runAsUser: 1001
+  triggers:
+  - type: "ConfigChange"
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  annotations:
+    prometheus.io/port: "9779"
+    prometheus.io/scrape: "true"
+  labels:
+    expose: "true"
+    app: "bqueue"
+    group: "net.alainpham"
+  name: "bqueue"
+spec:
+  ports:
+  - name: "http"
+    port: 8080
+    protocol: "TCP"
+    targetPort: 8080
+  selector:
+    app: "bqueue"
+    group: "net.alainpham"
+---
+apiVersion: "v1"
+kind: "Route"
+metadata:
+  annotations:
+    haproxy.router.openshift.io/balance: "roundrobin"
+  labels:
+    app: "bqueue"
+    group: "net.alainpham"
+  name: "bqueue"
+spec:
+  port:
+    targetPort: "http"
+  to:
+    kind: "Service"
+    name: "bqueue"
+status: {}

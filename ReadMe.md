@@ -29,6 +29,7 @@
     - [Running bqueue app](#running-bqueue-app)
     - [Run local container with specific network and IP address](#run-local-container-with-specific-network-and-ip-address)
   - [Push on dockerhub](#push-on-dockerhub)
+  - [DEploy on Openshift](#deploy-on-openshift)
 
 
 ### Features currently include 
@@ -168,7 +169,21 @@ docker rmi bqueue
 
 docker build -f src/main/docker/DockerfileBlender.jvm -t bqueue .
 
-docker run -d --net primenet --ip 172.18.0.10 --name bqueue -e QUARKUS_ARTEMIS_URL=tcp://172.18.0.1:61616?consumerWindowSize=0 -e BLENDERQUEUE_HOSTNAME=alpha bqueue
+docker run -d --net primenet --ip 172.18.0.10 --name bqueue -e QUARKUS_ARTEMIS_URL=tcp://amqbroker:61616?consumerWindowSize=0 -e BLENDERQUEUE_HOSTNAME=alpha bqueue
+
+docker run --rm --net primenet --ip 172.18.0.10 --name bqueue -e "QUARKUS_ARTEMIS_URL=tcp://amqbroker:61616?consumerWindowSize=0;sslEnabled=false" -e BLENDERQUEUE_HOSTNAME=alpha registry.hpel.lan/bqueue:latest
+
+docker run --rm --net primenet --ip 172.18.0.10 --name bqueue -e "QUARKUS_ARTEMIS_URL=tcp://amqbroker.hpel.lan:443?consumerWindowSize=0&sslEnabled=true&trustAll=true" -e BLENDERQUEUE_HOSTNAME=alpha registry.hpel.lan/bqueue:latest
+
+docker run -d --net primenet --ip 172.18.0.10 --name bqueue -e QUARKUS_ARTEMIS_URL=tcp://amqbroker:61616?consumerWindowSize=0 registry.hpel.lan/bqueue:latest
+
+docker tag bqueue:latest registry.hpel.lan/bqueue:1.0
+docker tag bqueue:latest registry.hpel.lan/bqueue:latest
+
+docker tag bqueue:latest alainpham/bqueue:latest
+
+docker push registry.hpel.lan/bqueue:1.0
+docker push registry.hpel.lan/bqueue:latest
 
 ```
 ## Push on dockerhub
@@ -178,3 +193,23 @@ docker login
 docker build -t bqueue -f src/main/docker/Dockerfile.jvm .
 docker tag bqueue:latest alainpham/bqueue:latest
 ```
+
+## DEploy on Openshift
+
+```
+
+oc edit schedulers.config.openshift.io cluster
+
+oc adm policy add-scc-to-group anyuid system:authenticated
+oc apply -f src/main/resources/ocp/deploy-simple.yml
+
+curl -XPOST -T plans-main-tiny.blend  http://bqueue-thefarm.apps.cluster-mds88.mds88.sandbox991.opentlc.com/upload/test.blend
+```
+
+
+oc delete
+
+
+ssh apham-redhat.com@bastion.mds88.sandbox991.opentlc.com
+
+uCuljqyVVJuY
