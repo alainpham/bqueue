@@ -168,11 +168,11 @@ docker stop bqueue
 docker rm bqueue
 docker rmi bqueue
 
-docker build -f src/main/docker/DockerfileBlender.jvm -t bqueue .
+docker build -f src/main/docker/Dockerfile.multiarch -t bqueue .
 
-docker run -d --net primenet --ip 172.18.0.10 --name bqueue -e QUARKUS_ARTEMIS_URL=tcp://amqbroker:61616?consumerWindowSize=0 -e BLENDERQUEUE_HOSTNAME=alpha bqueue
+docker run -d --net primenet --ip 172.18.0.10 --name bqueue -e QUARKUS_ARTEMIS_URL=tcp://artemis:61616?consumerWindowSize=0 -e BLENDERQUEUE_HOSTNAME=alpha bqueue
 
-docker run --rm --net primenet --ip 172.18.0.10 --name bqueue -e "QUARKUS_ARTEMIS_URL=tcp://amqbroker:61616?consumerWindowSize=0;sslEnabled=false" -e BLENDERQUEUE_HOSTNAME=alpha registry.hpel.lan/bqueue:latest
+docker run --rm --net primenet --ip 172.18.0.10 --name bqueue -e "QUARKUS_ARTEMIS_URL=tcp://artemis:61616?consumerWindowSize=0;sslEnabled=false" -e BLENDERQUEUE_HOSTNAME=alpha registry.hpel.lan/bqueue:latest
 
 docker run --rm --net primenet --ip 172.18.0.10 --name bqueue -e "QUARKUS_ARTEMIS_URL=tcp://amqbroker.hpel.lan:443?consumerWindowSize=0&sslEnabled=true&trustAll=true" -e BLENDERQUEUE_HOSTNAME=alpha registry.hpel.lan/bqueue:latest
 

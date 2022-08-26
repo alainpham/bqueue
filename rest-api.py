@@ -12,8 +12,8 @@ import threading
 # outputFolder=argv[0]
 # blendFolder=argv[1]
 
-outputFolder=os.getenv('BLENDER_OUTPUT_FOLDER', '/tmp/blender/blender-output')
-blendFolder=os.getenv('BLENDER_FILES_FOLDER', '/tmp/blender/blender-files')
+outputFolder=os.getenv('BLENDER_OUTPUT_FOLDER', '/data/blender/blender-output')
+blendFolder=os.getenv('BLENDER_FILES_FOLDER', '/data/blender/blender-files')
 
 if not os.path.exists(outputFolder):
     os.makedirs(outputFolder)

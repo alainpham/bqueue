@@ -647,5 +647,5 @@ elif [ "${first_arg}" = "run" ]; then
   # as first argument to your
   shift
 fi
-nohup /bin/blender -b -P /deployments/rest-api.py -- /deployments/data/renders /deployments/data/blendfiles & 
+nohup /bin/blender -b -P /deployments/rest-api.py & 
 run "$@"

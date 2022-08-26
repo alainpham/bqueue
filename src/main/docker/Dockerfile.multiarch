@@ -2,7 +2,40 @@ FROM eclipse-temurin:11.0.16.1_1-jre
 
 USER root
 
+
+RUN apt-get update && apt-get install -y \ 
+	wget \ 
+    curl \
+	libopenexr-dev \ 
+	bzip2 \ 
+	build-essential \ 
+	zlib1g-dev \ 
+	libxmu-dev \ 
+	libxi-dev \ 
+	libxxf86vm-dev \ 
+	libfontconfig1 \ 
+	libxrender1 \ 
+	libgl1-mesa-glx \ 
+	xz-utils \
+    imagemagick
+
 RUN useradd -u 1000 appuser
+
+# Download and install Blender
+
+COPY distrib/blender-3.2.2-linux-x64.tar.xz /blender.tar.xz
+
+RUN tar -xvf blender.tar.xz --strip-components=1 -C /bin \ 
+	&& rm -rf blender.tar.xz 
+
+RUN  \
+    mkdir /data \
+    && chown 1000 /data \
+    && chmod "g+rwX" /data
+
+COPY --chown=1000 run-java.sh /deployments/run-java.sh
+RUN chmod 540 /deployments/run-java.sh 
+
 
 # Configure the JAVA_OPTIONS, you can add -XshowSettings:vm to also display the heap size.
 ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
@@ -12,9 +45,10 @@ COPY --chown=1000 target/quarkus-app/lib/ /deployments/lib/
 COPY --chown=1000 target/quarkus-app/*.jar /deployments/
 COPY --chown=1000 target/quarkus-app/app/ /deployments/app/
 COPY --chown=1000 target/quarkus-app/quarkus/ /deployments/quarkus/
+COPY --chown=1000 rest-api.py /deployments/rest-api.py
 
 EXPOSE 8080
 USER 1000
 
-ENTRYPOINT [ "java", "-jar", "/deployments/quarkus-run.jar" ]
+ENTRYPOINT [ "/deployments/run-java.sh" ]
 
